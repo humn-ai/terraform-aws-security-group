@@ -40,23 +40,121 @@ include:
 
 # How to use this module
 usage: |-
-  The below values shown in the usage of this module are purely representative, please replace desired values as required.
+  There are two ways to create security groups using this module:
 
-  TO-DO
+  1. [Specifying predefined rules (HTTP, SSH, etc)](https://github.com/terraform-aws-modules/terraform-aws-security-group#security-group-with-predefined-rules)
+  1. [Specifying custom rules](https://github.com/terraform-aws-modules/terraform-aws-security-group#security-group-with-custom-rules)
+
+  ### Security group with predefined rules
 
   ```hcl
+  module "web_server_sg" {
+    source = "terraform-aws-modules/security-group/aws//modules/http-80"
+
+    name        = "web-server"
+    description = "Security group for web-server with HTTP ports open within VPC"
+    vpc_id      = "vpc-12345678"
+
+    ingress_cidr_blocks = ["10.10.0.0/16"]
+  }
+  ```
+
+  ### Security group with custom rules
+
+  ```hcl
+  module "vote_service_sg" {
+    source = "terraform-aws-modules/security-group/aws"
+
+    name        = "user-service"
+    description = "Security group for user-service with custom ports open within VPC, and PostgreSQL publicly open"
+    vpc_id      = "vpc-12345678"
+
+    ingress_cidr_blocks      = ["10.10.0.0/16"]
+    ingress_rules            = ["https-443-tcp"]
+    ingress_with_cidr_blocks = [
+      {
+        from_port   = 8080
+        to_port     = 8090
+        protocol    = "tcp"
+        description = "User-service ports"
+        cidr_blocks = "10.10.0.0/16"
+      },
+      {
+        rule        = "postgresql-tcp"
+        cidr_blocks = "0.0.0.0/0"
+      },
+    ]
+  }
+  ```
+
+  ### Note about "value of 'count' cannot be computed"
+
+  Terraform 0.11 has a limitation which does not allow **computed** values inside `count` attribute on resources (issues: [#16712](https://github.com/hashicorp/terraform/issues/16712), [#18015](https://github.com/hashicorp/terraform/issues/18015), ...)
+
+  Computed values are values provided as outputs from `module`. Non-computed values are all others - static values, values referenced as `variable` and from data-sources.
+
+  When you need to specify computed value inside security group rule argument you need to specify it using an argument which starts with `computed_` and provide a number of elements in the argument which starts with `number_of_computed_`. See these examples:
+
+  ```hcl
+  module "http_sg" {
+    source = "terraform-aws-modules/security-group/aws"
+    # omitted for brevity
+  }
+
+  module "db_computed_source_sg" {
+    # omitted for brevity
+
+    vpc_id = "vpc-12345678" # these are valid values also - "${module.vpc.vpc_id}" and "${local.vpc_id}"
+
+    computed_ingress_with_source_security_group_id = [
+      {
+        rule                     = "mysql-tcp"
+        source_security_group_id = "${module.http_sg.this_security_group_id}"
+      }
+    ]
+    number_of_computed_ingress_with_source_security_group_id = 1
+  }
+
+  module "db_computed_sg" {
+    # omitted for brevity
+
+    ingress_cidr_blocks = ["10.10.0.0/16", "${data.aws_security_group.default.id}"]
+
+    computed_ingress_cidr_blocks = ["${module.vpc.vpc_cidr_block}"]
+    number_of_computed_ingress_cidr_blocks = 1
+  }
+
+  module "db_computed_merged_sg" {
+    # omitted for brevity
+
+    computed_ingress_cidr_blocks = ["10.10.0.0/16", "${module.vpc.vpc_cidr_block}"]
+    number_of_computed_ingress_cidr_blocks = 2
+  }
+  ```
+
+  Note that `db_computed_sg` and `db_computed_merged_sg` are equal, because it is possible to put both computed and non-computed values in arguments starting with `computed_`.
+
+  ## Conditional creation
+
+  Sometimes you need to have a way to create security group conditionally but Terraform does not allow to use `count` inside `module` block, so the solution is to specify argument `create`.
+
+  ```hcl
+  # This security group will not be created
+  module "vote_service_sg" {
+    source = "terraform-aws-modules/security-group/aws"
+
+    create = false
+    # ... omitted
+  }
   ```
 
 # Simple and advanced examples of this project
 examples: |-
-  Simple and advanced examples of this project.
-
-  ### Advanced Example 1:
-
-  TO-DO
-
-    ```hcl
-    ```
+  * [Complete Security Group example](https://github.com/terraform-aws-modules/terraform-aws-security-group/tree/master/examples/complete) shows all available parameters to configure security group.
+  * [HTTP Security Group example](https://github.com/terraform-aws-modules/terraform-aws-security-group/tree/master/examples/http) shows more applicable security groups for common web-servers.
+  * [Disable creation of Security Group example](https://github.com/terraform-aws-modules/terraform-aws-security-group/tree/master/examples/disabled) shows how to disable creation of security group.
+  * [Dynamic values inside Security Group rules example](https://github.com/terraform-aws-modules/terraform-aws-security-group/tree/master/examples/dynamic) shows how to specify values inside security group rules (data-sources and variables are allowed).
+  * [Computed values inside Security Group rules example](https://github.com/terraform-aws-modules/terraform-aws-security-group/tree/master/examples/computed) shows how to specify computed values inside security group rules (solution for `value of 'count' cannot be computed` problem).
 
 # Related projects
 related:
