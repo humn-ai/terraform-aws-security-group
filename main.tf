@@ -22,7 +22,7 @@ resource "aws_security_group" "this" {
 
   tags = merge(
     {
-      "Name" = format("%s", var.module.this.id)
+      "Name" = format("%s", module.this.id)
     },
     module.this.tags,
   )
@@ -41,7 +41,7 @@ resource "aws_security_group" "this_name_prefix" {
 
   tags = merge(
     {
-      "Name" = format("%s", var.module.this.id)
+      "Name" = format("%s", module.this.id)
     },
     module.this.tags,
   )
