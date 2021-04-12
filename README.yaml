@@ -1,0 +1,84 @@
+---
+#
+# This is the canonical configuration for the `README.md`
+# Run `make readme` to rebuild the `README.md`
+#
+
+# Name of this project
+name: tf-mod-aws-security-group
+
+# Canonical Git repo
+github_repo: https://github.com/humn-ai/tf-mod-aws-security-group
+
+# # Badges to display
+# badges:
+#   - name: "Build Status"
+#     image: ""
+#     url: ""
+
+# Short description of this project
+description: |-
+  Terraform module which creates [EC2 security group within VPC](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html) on AWS.
+  These types of resources are supported:
+  * [EC2-VPC Security Group](https://www.terraform.io/docs/providers/aws/r/security_group.html)
+  * [EC2-VPC Security Group Rule](https://www.terraform.io/docs/providers/aws/r/security_group_rule.html)
+
+  ## Features
+
+  This module aims to implement **ALL** combinations of arguments supported by AWS and latest stable version of Terraform:
+  * IPv4/IPv6 CIDR blocks
+  * [VPC endpoint prefix lists](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-endpoints.html) (use data source [aws_prefix_list](https://www.terraform.io/docs/providers/aws/d/prefix_list.html))
+  * Access from source security groups
+  * Access from self
+  * Named rules ([see the rules here](https://github.com/terraform-aws-modules/terraform-aws-security-group/blob/master/rules.tf))
+  * Named groups of rules with ingress (inbound) and egress (outbound) ports open for common scenarios (eg, [ssh](https://github.com/terraform-aws-modules/terraform-aws-security-group/tree/master/modules/ssh), [http-80](https://github.com/terraform-aws-modules/terraform-aws-security-group/tree/master/modules/http-80), [mysql](https://github.com/terraform-aws-modules/terraform-aws-security-group/tree/master/modules/mysql), see the whole list [here](https://github.com/terraform-aws-modules/terraform-aws-security-group/blob/master/modules/README.md))
+  * Conditionally create security group and all required security group rules ("single boolean switch").
+
+# External context to include
+include:
+  - "docs/terraform.md"
+
+# How to use this module
+usage: |-
+  The below values shown in the usage of this module are purely representative, please replace desired values as required.
+
+  TO-DO
+
+  ```hcl
+  ```
+
+# Simple and advanced examples of this project
+examples: |-
+  Simple and advanced examples of this project.
+
+  ### Advanced Example 1:
+
+  TO-DO
+
+    ```hcl
+    ```
+
+# Related projects
+related:
+  - name: terraform-aws-modules/terraform-aws-security-group
+    description: forked module
+    url: https://github.com/terraform-aws-modules/terraform-aws-security-group
+
+# Contributor information
+contributors:
+  - name: "Callum Robertson"
+    github: "callumccr"
+    avatar: https://media-exp1.licdn.com/dms/image/C5603AQHb_3oZMZA5YA/profile-displayphoto-shrink_200_200/0?e=1588809600&v=beta&t=5QQQAlHrm1od5fQNZwdjOtbZWvsGcgNBqFRhZWgnPx4
+    homepage: https://www.linkedin.com/in/callum-robertson-1a55b6110/
+
+# Jira information
+jira:
+  - project:
+    project_url:
+    epic:
+    epic_url:
+    user_story:
+    user_story_url:
+
+---
+

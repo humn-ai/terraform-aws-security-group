@@ -13,18 +13,18 @@ locals {
 # Security group with name
 ##########################
 resource "aws_security_group" "this" {
-  count = var.create && false == var.use_name_prefix ? 1 : 0
+  count = module.this.enabled && false == var.use_name_prefix ? 1 : 0
 
-  name                   = var.name
+  name                   = module.this.id
   description            = var.description
   vpc_id                 = var.vpc_id
   revoke_rules_on_delete = var.revoke_rules_on_delete
 
   tags = merge(
     {
-      "Name" = format("%s", var.name)
+      "Name" = format("%s", var.module.this.id)
     },
-    var.tags,
+    module.this.tags,
   )
 }
 
@@ -32,7 +32,7 @@ resource "aws_security_group" "this" {
 # Security group with name_prefix
 #################################
 resource "aws_security_group" "this_name_prefix" {
-  count = var.create && var.use_name_prefix ? 1 : 0
+  count = module.this.enabled && var.use_name_prefix ? 1 : 0
 
   name_prefix            = "${var.name}-"
   description            = var.description
@@ -41,9 +41,9 @@ resource "aws_security_group" "this_name_prefix" {
 
   tags = merge(
     {
-      "Name" = format("%s", var.name)
+      "Name" = format("%s", var.module.this.id)
     },
-    var.tags,
+    module.this.tags,
   )
 
   lifecycle {
@@ -56,7 +56,7 @@ resource "aws_security_group" "this_name_prefix" {
 ###################################
 # Security group rules with "cidr_blocks" and it uses list of rules names
 resource "aws_security_group_rule" "ingress_rules" {
-  count = var.create ? length(var.ingress_rules) : 0
+  count = module.this.enabled ? length(var.ingress_rules) : 0
 
   security_group_id = local.this_sg_id
   type              = "ingress"
@@ -73,7 +73,7 @@ resource "aws_security_group_rule" "ingress_rules" {
 
 # Computed - Security group rules with "cidr_blocks" and it uses list of rules names
 resource "aws_security_group_rule" "computed_ingress_rules" {
-  count = var.create ? var.number_of_computed_ingress_rules : 0
+  count = module.this.enabled ? var.number_of_computed_ingress_rules : 0
 
   security_group_id = local.this_sg_id
   type              = "ingress"
@@ -93,7 +93,7 @@ resource "aws_security_group_rule" "computed_ingress_rules" {
 ##########################
 # Security group rules with "source_security_group_id", but without "cidr_blocks" and "self"
 resource "aws_security_group_rule" "ingress_with_source_security_group_id" {
-  count = var.create ? length(var.ingress_with_source_security_group_id) : 0
+  count = module.this.enabled ? length(var.ingress_with_source_security_group_id) : 0
 
   security_group_id = local.this_sg_id
   type              = "ingress"
@@ -137,7 +137,7 @@ resource "aws_security_group_rule" "ingress_with_source_security_group_id" {
 
 # Computed - Security group rules with "source_security_group_id", but without "cidr_blocks" and "self"
 resource "aws_security_group_rule" "computed_ingress_with_source_security_group_id" {
-  count = var.create ? var.number_of_computed_ingress_with_source_security_group_id : 0
+  count = module.this.enabled ? var.number_of_computed_ingress_with_source_security_group_id : 0
 
   security_group_id = local.this_sg_id
   type              = "ingress"
@@ -181,7 +181,7 @@ resource "aws_security_group_rule" "computed_ingress_with_source_security_group_
 
 # Security group rules with "cidr_blocks", but without "ipv6_cidr_blocks", "source_security_group_id" and "self"
 resource "aws_security_group_rule" "ingress_with_cidr_blocks" {
-  count = var.create ? length(var.ingress_with_cidr_blocks) : 0
+  count = module.this.enabled ? length(var.ingress_with_cidr_blocks) : 0
 
   security_group_id = local.this_sg_id
   type              = "ingress"
@@ -220,7 +220,7 @@ resource "aws_security_group_rule" "ingress_with_cidr_blocks" {
 
 # Computed - Security group rules with "cidr_blocks", but without "ipv6_cidr_blocks", "source_security_group_id" and "self"
 resource "aws_security_group_rule" "computed_ingress_with_cidr_blocks" {
-  count = var.create ? var.number_of_computed_ingress_with_cidr_blocks : 0
+  count = module.this.enabled ? var.number_of_computed_ingress_with_cidr_blocks : 0
 
   security_group_id = local.this_sg_id
   type              = "ingress"
@@ -271,7 +271,7 @@ resource "aws_security_group_rule" "computed_ingress_with_cidr_blocks" {
 
 # Security group rules with "ipv6_cidr_blocks", but without "cidr_blocks", "source_security_group_id" and "self"
 resource "aws_security_group_rule" "ingress_with_ipv6_cidr_blocks" {
-  count = var.create ? length(var.ingress_with_ipv6_cidr_blocks) : 0
+  count = module.this.enabled ? length(var.ingress_with_ipv6_cidr_blocks) : 0
 
   security_group_id = local.this_sg_id
   type              = "ingress"
@@ -310,7 +310,7 @@ resource "aws_security_group_rule" "ingress_with_ipv6_cidr_blocks" {
 
 # Computed - Security group rules with "ipv6_cidr_blocks", but without "cidr_blocks", "source_security_group_id" and "self"
 resource "aws_security_group_rule" "computed_ingress_with_ipv6_cidr_blocks" {
-  count = var.create ? var.number_of_computed_ingress_with_ipv6_cidr_blocks : 0
+  count = module.this.enabled ? var.number_of_computed_ingress_with_ipv6_cidr_blocks : 0
 
   security_group_id = local.this_sg_id
   type              = "ingress"
@@ -361,7 +361,7 @@ resource "aws_security_group_rule" "computed_ingress_with_ipv6_cidr_blocks" {
 
 # Security group rules with "self", but without "cidr_blocks" and "source_security_group_id"
 resource "aws_security_group_rule" "ingress_with_self" {
-  count = var.create ? length(var.ingress_with_self) : 0
+  count = module.this.enabled ? length(var.ingress_with_self) : 0
 
   security_group_id = local.this_sg_id
   type              = "ingress"
@@ -393,7 +393,7 @@ resource "aws_security_group_rule" "ingress_with_self" {
 
 # Computed - Security group rules with "self", but without "cidr_blocks" and "source_security_group_id"
 resource "aws_security_group_rule" "computed_ingress_with_self" {
-  count = var.create ? var.number_of_computed_ingress_with_self : 0
+  count = module.this.enabled ? var.number_of_computed_ingress_with_self : 0
 
   security_group_id = local.this_sg_id
   type              = "ingress"
@@ -432,7 +432,7 @@ resource "aws_security_group_rule" "computed_ingress_with_self" {
 ##################################
 # Security group rules with "cidr_blocks" and it uses list of rules names
 resource "aws_security_group_rule" "egress_rules" {
-  count = var.create ? length(var.egress_rules) : 0
+  count = module.this.enabled ? length(var.egress_rules) : 0
 
   security_group_id = local.this_sg_id
   type              = "egress"
@@ -449,7 +449,7 @@ resource "aws_security_group_rule" "egress_rules" {
 
 # Computed - Security group rules with "cidr_blocks" and it uses list of rules names
 resource "aws_security_group_rule" "computed_egress_rules" {
-  count = var.create ? var.number_of_computed_egress_rules : 0
+  count = module.this.enabled ? var.number_of_computed_egress_rules : 0
 
   security_group_id = local.this_sg_id
   type              = "egress"
@@ -469,7 +469,7 @@ resource "aws_security_group_rule" "computed_egress_rules" {
 #########################
 # Security group rules with "source_security_group_id", but without "cidr_blocks" and "self"
 resource "aws_security_group_rule" "egress_with_source_security_group_id" {
-  count = var.create ? length(var.egress_with_source_security_group_id) : 0
+  count = module.this.enabled ? length(var.egress_with_source_security_group_id) : 0
 
   security_group_id = local.this_sg_id
   type              = "egress"
@@ -513,7 +513,7 @@ resource "aws_security_group_rule" "egress_with_source_security_group_id" {
 
 # Computed - Security group rules with "source_security_group_id", but without "cidr_blocks" and "self"
 resource "aws_security_group_rule" "computed_egress_with_source_security_group_id" {
-  count = var.create ? var.number_of_computed_egress_with_source_security_group_id : 0
+  count = module.this.enabled ? var.number_of_computed_egress_with_source_security_group_id : 0
 
   security_group_id = local.this_sg_id
   type              = "egress"
@@ -557,7 +557,7 @@ resource "aws_security_group_rule" "computed_egress_with_source_security_group_i
 
 # Security group rules with "cidr_blocks", but without "ipv6_cidr_blocks", "source_security_group_id" and "self"
 resource "aws_security_group_rule" "egress_with_cidr_blocks" {
-  count = var.create ? length(var.egress_with_cidr_blocks) : 0
+  count = module.this.enabled ? length(var.egress_with_cidr_blocks) : 0
 
   security_group_id = local.this_sg_id
   type              = "egress"
@@ -596,7 +596,7 @@ resource "aws_security_group_rule" "egress_with_cidr_blocks" {
 
 # Computed - Security group rules with "cidr_blocks", but without "ipv6_cidr_blocks", "source_security_group_id" and "self"
 resource "aws_security_group_rule" "computed_egress_with_cidr_blocks" {
-  count = var.create ? var.number_of_computed_egress_with_cidr_blocks : 0
+  count = module.this.enabled ? var.number_of_computed_egress_with_cidr_blocks : 0
 
   security_group_id = local.this_sg_id
   type              = "egress"
@@ -647,7 +647,7 @@ resource "aws_security_group_rule" "computed_egress_with_cidr_blocks" {
 
 # Security group rules with "ipv6_cidr_blocks", but without "cidr_blocks", "source_security_group_id" and "self"
 resource "aws_security_group_rule" "egress_with_ipv6_cidr_blocks" {
-  count = var.create ? length(var.egress_with_ipv6_cidr_blocks) : 0
+  count = module.this.enabled ? length(var.egress_with_ipv6_cidr_blocks) : 0
 
   security_group_id = local.this_sg_id
   type              = "egress"
@@ -686,7 +686,7 @@ resource "aws_security_group_rule" "egress_with_ipv6_cidr_blocks" {
 
 # Computed - Security group rules with "ipv6_cidr_blocks", but without "cidr_blocks", "source_security_group_id" and "self"
 resource "aws_security_group_rule" "computed_egress_with_ipv6_cidr_blocks" {
-  count = var.create ? var.number_of_computed_egress_with_ipv6_cidr_blocks : 0
+  count = module.this.enabled ? var.number_of_computed_egress_with_ipv6_cidr_blocks : 0
 
   security_group_id = local.this_sg_id
   type              = "egress"
@@ -737,7 +737,7 @@ resource "aws_security_group_rule" "computed_egress_with_ipv6_cidr_blocks" {
 
 # Security group rules with "self", but without "cidr_blocks" and "source_security_group_id"
 resource "aws_security_group_rule" "egress_with_self" {
-  count = var.create ? length(var.egress_with_self) : 0
+  count = module.this.enabled ? length(var.egress_with_self) : 0
 
   security_group_id = local.this_sg_id
   type              = "egress"
@@ -769,7 +769,7 @@ resource "aws_security_group_rule" "egress_with_self" {
 
 # Computed - Security group rules with "self", but without "cidr_blocks" and "source_security_group_id"
 resource "aws_security_group_rule" "computed_egress_with_self" {
-  count = var.create ? var.number_of_computed_egress_with_self : 0
+  count = module.this.enabled ? var.number_of_computed_egress_with_self : 0
 
   security_group_id = local.this_sg_id
   type              = "egress"

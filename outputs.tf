@@ -1,3 +1,7 @@
+# -----------------------------------------------------------------------------
+# Outputs: TF-MOD-AWS-SECURITY-GROUP
+# -----------------------------------------------------------------------------
+
 output "this_security_group_id" {
   description = "The ID of the security group"
   value = concat(
