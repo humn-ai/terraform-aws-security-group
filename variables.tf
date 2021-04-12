@@ -51,12 +51,6 @@ variable "revoke_rules_on_delete" {
   default     = false
 }
 
-variable "tags" {
-  description = "A mapping of tags to assign to security group"
-  type        = map(string)
-  default     = {}
-}
-
 ##########
 # Ingress
 ##########
