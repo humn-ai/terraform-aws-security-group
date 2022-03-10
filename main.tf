@@ -271,7 +271,7 @@ resource "aws_security_group_rule" "computed_ingress_with_cidr_blocks" {
 
 # Security group rules with "ipv6_cidr_blocks", but without "cidr_blocks", "source_security_group_id" and "self"
 resource "aws_security_group_rule" "ingress_with_ipv6_cidr_blocks" {
-  count = module.this.enabled ? length(var.ingress_with_ipv6_cidr_blocks) : 0
+  for_each = module.this.enabled ? var.ingress_with_ipv6_cidr_blocks : []
 
   security_group_id = local.this_sg_id
   type              = "ingress"
@@ -279,32 +279,32 @@ resource "aws_security_group_rule" "ingress_with_ipv6_cidr_blocks" {
   ipv6_cidr_blocks = split(
     ",",
     lookup(
-      var.ingress_with_ipv6_cidr_blocks[count.index],
+      each.value,
       "ipv6_cidr_blocks",
       join(",", var.ingress_ipv6_cidr_blocks),
     ),
   )
   prefix_list_ids = var.ingress_prefix_list_ids
   description = lookup(
-    var.ingress_with_ipv6_cidr_blocks[count.index],
+    each.value,
     "description",
     "Ingress Rule",
   )
 
   from_port = lookup(
-    var.ingress_with_ipv6_cidr_blocks[count.index],
+    each.value,
     "from_port",
-    var.rules[lookup(var.ingress_with_ipv6_cidr_blocks[count.index], "rule", "_")][0],
+    var.rules[lookup(each.value, "rule", "_")][0],
   )
   to_port = lookup(
-    var.ingress_with_ipv6_cidr_blocks[count.index],
+    each.value,
     "to_port",
-    var.rules[lookup(var.ingress_with_ipv6_cidr_blocks[count.index], "rule", "_")][1],
+    var.rules[lookup(each.value, "rule", "_")][1],
   )
   protocol = lookup(
-    var.ingress_with_ipv6_cidr_blocks[count.index],
+    each.value,
     "protocol",
-    var.rules[lookup(var.ingress_with_ipv6_cidr_blocks[count.index], "rule", "_")][2],
+    var.rules[lookup(each.value, "rule", "_")][2],
   )
 }
 
