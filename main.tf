@@ -469,7 +469,7 @@ resource "aws_security_group_rule" "computed_egress_rules" {
 #########################
 # Security group rules with "source_security_group_id", but without "cidr_blocks" and "self"
 resource "aws_security_group_rule" "egress_with_source_security_group_id" {
-  for_each = module.this.enabled ? var.egress_with_source_security_group_id : []
+  for_each = { for rule in var.egress_with_source_security_group_id : rule.source_security_group_id => rule }
 
   security_group_id = local.this_sg_id
   type              = "egress"
