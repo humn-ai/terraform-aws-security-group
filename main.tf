@@ -181,7 +181,6 @@ resource "aws_security_group_rule" "computed_ingress_with_source_security_group_
 
 # Security group rules with "cidr_blocks", but without "ipv6_cidr_blocks", "source_security_group_id" and "self"
 resource "aws_security_group_rule" "ingress_with_cidr_blocks" {
-  count    = module.this.enabled ? length(var.ingress_with_cidr_blocks) : 0
   for_each = module.this.enabled ? var.ingress_with_cidr_blocks : []
 
   security_group_id = local.this_sg_id
